@@ -1,4 +1,151 @@
-const studentList = document.querySelector('#studentList');
+// 1. Seleziono gli elementi del DOM
+const formLibro = document.getElementById('form-libro');
+const inputTitolo = document.getElementById('titolo');
+const inputAutore = document.getElementById('autore');
+const inputAnno = document.getElementById('anno');
+const selectFormato = document.getElementById('formato');
+
+const listaLibri = document.getElementById('lista-libri');
+const contatore = document.getElementById('contatore');
+const btnSvuotaTutto = document.getElementById('svuota-tutto');
+
+let libri = JSON.parse(localStorage.getItem('libri')) || [];
+
+// Funzione per salvare nel localStorage e aggiornare la grafica
+function salvaEAggiorna() {
+    localStorage.setItem('libri', JSON.stringify(libri));
+    renderLibri();
+}
+
+// 3. Funzione per disegnare i libri nella pagina
+function renderLibri() {
+    listaLibri.innerHTML = '';
+    contatore.textContent = libri.length;
+
+    libri.forEach((libro) => {
+        const card = document.createElement('div');
+        card.className = 'card shadow-sm';
+
+        // Stile diverso se il libro è già stato letto
+        const stileTitolo = libro.letto ? 'text-decoration-line-through text-muted' : '';
+        const testoBottoneLetto = libro.letto ? 'Segna come non letto' : 'Segna come letto';
+        const classeBottoneLetto = libro.letto ? 'btn-outline-secondary' : 'btn-outline-success';
+
+        card.innerHTML = `
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-1 ${stileTitolo}">${libro.titolo}</h5>
+                    <p class="card-text text-muted small mb-0">
+                        ${libro.autore} · ${libro.anno} · <span class="text-capitalize">${libro.formato}</span>
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm ${classeBottoneLetto}" onclick="toggleLetto('${libro.id}')">
+                        ${testoBottoneLetto}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminaLibro('${libro.id}')">
+                        Elimina
+                    </button>
+                </div>
+            </div>
+        `;
+
+        listaLibri.appendChild(card);
+    });
+}
+
+// 4. Aggiunta di un nuovo libro dal form
+formLibro.addEventListener('submit', (e) => {
+    e.preventDefault(); // Evita il ricaricamento della pagina
+
+    const nuovoLibro = {
+        id: crypto.randomUUID(), // Genera un ID unico come nello screenshot
+        titolo: inputTitolo.value.trim(),
+        autore: inputAutore.value.trim(),
+        anno: inputAnno.value,
+        formato: selectFormato.value,
+        letto: false
+    };
+
+    libri.push(nuovoLibro);
+    salvaEAggiorna();
+    formLibro.reset(); // Pulisce i campi del form
+});
+
+// 5. Funzioni globali per i pulsanti delle card
+window.toggleLetto = function(id) {
+    libri = libri.map((libro) => {
+        if (libro.id === id) {
+            return { ...libro, letto: !libro.letto };
+        }
+        return libro;
+    });
+    salvaEAggiorna();
+};
+
+window.eliminaLibro = function(id) {
+    libri = libri.filter((libro) => libro.id !== id);
+    salvaEAggiorna();
+};
+
+// 6. Pulsante "Svuota tutto"
+if (btnSvuotaTutto) {
+    btnSvuotaTutto.addEventListener('click', () => {
+        libri = [];
+        salvaEAggiorna();
+    });
+}
+
+// Mostro i libri appena si apre la pagina
+renderLibri();
+
+
+
+
+/*class Product {
+    constructor(name, price) {
+        this.name = name;
+        this.price = price;
+	
+    }
+
+    displayProduct() {
+        console.log(`Product: ${this.name}`);
+        console.log(`Price: $${this.price.toFixed(2)}`);
+    }
+
+    calculateTotal(salesTax) {
+        return this.price + (this.price * salesTax);
+    }
+}
+
+const salesTax = 0.05;
+
+const product1 = new Product('Shirt', 19.90);
+const product2 = new Product('Trousers', 29.90);
+const product3 = new Product('Underwear', 39.90);
+
+product2.displayProduct();
+const total = product2.calculateTotal(salesTax);
+console.log(`Total price (with taxes): $${total.toFixed(2)}`);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const studentList = document.querySelector('#studentList');
 const registerForm = document.querySelector('form');
 const newName = document.querySelector('#newName');
 const newSurname = document.querySelector('#newSurname');
@@ -24,7 +171,7 @@ class Student {
 	printStudent() {
 		const isFrequency = this.frequency ? 'Sì' : 'No';
 		const newLi = document.createElement('li');
-		newLi.textContent += `Student ${this.studentName} ${this.studentSurname} di anni ${this.studentAge}, frequentante: ${isFrequency}, ID studente: ${this.#id}`;
+		newLi.textContent += `Student ${ this.studentName } ${ this.studentSurname } di anni ${ this.studentAge }, frequentante: ${ isFrequency }, ID studente: ${ this.#id }`;
 		studentList.appendChild(newLi);
 	}
 }
@@ -53,7 +200,7 @@ class Person {
 
 	regards() {
 		this.personNumber++;
-		return `Ciao, sono ${this.name} ${this.surname} e sono l'iscritto numero ${this.personNumber}`;
+		return `Ciao, sono ${ this.name } ${ this.surname } e sono l'iscritto numero ${this.personNumber}`;
 	}
 }
 
@@ -167,4 +314,6 @@ const myDigital1 = new Digital(
 	'FLAC',
 	'240MB',
 );
-console.log(myDigital1.print());
+console.log(myDigital1.print()); */
+
+
